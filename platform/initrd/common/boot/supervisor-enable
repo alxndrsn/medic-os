@@ -1,0 +1,67 @@
+#!/bin/sh
+
+source '/boot/include/utility'
+source '/boot/include/supervisor'
+
+enable()
+{
+  local package="$1"
+  local service="$2"
+  local is_wildcard="$3"
+
+  if [ "$is_wildcard" ]; then
+    if supervisor_is_service_enabled "$package" "$service"; then
+      warn "Service '$package/$service is already enabled; skipping"
+      return 0
+    fi
+  fi
+
+  supervisor_service_enable "$package" "$service" \
+    || fatal "Failed to enable service '$package/$service'"
+
+  info "Service '$package/$service' was enabled successfully"
+  return 0
+}
+
+main()
+{
+  local package="$1"
+  shift 1
+
+  if [ -z "$package" ]; then
+    usage
+  fi
+
+  require_root
+  supervisor_init
+
+  if [ "$#" -le 0 ]; then
+    supervisor_list_all_services "$package" | while read service; do
+      enable "$package" "$service" 't'
+    done
+    local rv="$?"
+    [ "$rv" -ne 0 ] && return "$rv"
+  else
+    for service in "$@"; do
+      enable "$package" "$service"
+    done
+  fi
+
+  if [ $# -le 0 ]; then
+    success "Finished enabling services in package '$package'"
+  else
+    success "Selected services in package '$package' are now enabled"
+  fi
+
+  return 0
+}
+
+usage()
+{
+  echo "Usage: $0 <package-name> [service-name]..."
+  exit 111
+}
+
+main "$@"
+exit "$?"
+
