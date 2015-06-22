@@ -22,3 +22,20 @@ Releases
 There is no general release at this time. For more information, please contact
 Medic Mobile at http://medicmobile.org.
 
+
+Getting Started with the OS
+---------------------------
+
+1. download a pre-built ISO from [here][1]
+2. boot from the ISO in a virtual machine
+3. point your browser to the IP address of the VM - this should be displayed at startup
+4. set up an admin password
+
+
+SSH access
+----------
+
+SSH access is available on port 33696.  Username is `vm`, and password is the admin password set up in _Getting Started_.
+
+
+[1]: http://TODO
